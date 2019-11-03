@@ -32,7 +32,7 @@ exports.userSignupValidator = (req, res, next) => {
     .isLength({
         min: 4,
         max: 2000
-    }) 
+    });
 
     // check for password
     req.check("password", "Password is required").notEmpty();
@@ -40,12 +40,12 @@ exports.userSignupValidator = (req, res, next) => {
     .isLength({min: 6})
     .withMessage("Password must contain at least 6 characters")
     .matches(/\d/)
-    .withMessage("Password must Contain a Numbers")
+    .withMessage("Password must Contain a Numbers");
     // check for Errors
     const errors = req.validationErrors();
-    if(errors) {
-        const firstError = errors.map((error)=> error.msg[0])
-        return res.status(400).json({error: firstError})
+    if (errors) {
+        const firstError = errors.map(error => error.msg)[0];
+        return res.status(400).json({ error: firstError });
     } 
     // Proceed To next middleware
     next();
