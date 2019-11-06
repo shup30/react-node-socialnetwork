@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const MongoClient = require('mongodb').MongoClient;
+const cors = require('cors');
 const expressValidator = require('express-validator');
 
 
@@ -33,6 +34,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(expressValidator());
+app.use(cors());
 app.use("/", postRoutes);
 app.use("/", authRoutes);
 app.use("/", userRoutes);
@@ -46,4 +48,4 @@ app.use(function (err, req, res, next) {
 
 const port = process.env.PORT || 8080; 
 
-app.listen(port, () => {console.log('A Node JS API is listening on port: ${port}')});  
+app.listen(port, () => {console.log(`A Node JS API is listening on port: ${port}`)});  
