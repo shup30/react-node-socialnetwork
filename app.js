@@ -9,8 +9,7 @@ const MongoClient = require('mongodb').MongoClient;
 const cors = require('cors');
 const expressValidator = require('express-validator');
 
-
-dotenv.config()
+dotenv.config();
 //db
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true , useUnifiedTopology: true })
 .then(()=> console.log('db connected'))
@@ -24,9 +23,7 @@ const { getPosts } = require('./routes/post');
 //
 const postRoutes = require("./routes/post");
 const authRoutes = require("./routes/auth");
-const userRoutes = require("./routes/user")
-
-
+const userRoutes = require("./routes/user");
 
 //middleware 
 app.use(morgan("dev"));    
@@ -44,8 +41,6 @@ app.use(function (err, req, res, next) {
     }
   });
 
-
-
 const port = process.env.PORT || 8080; 
 
-app.listen(port, () => {console.log(`A Node JS API is listening on port: ${port}`)});  
+app.listen(port, () => {console.log(`A Node JS API is listening on port: ${port}`)}); 

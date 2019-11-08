@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { signup } from "../auth";
+import { Link } from "react-router-dom";
 
 export default class Signup extends Component {
   constructor() {
@@ -25,7 +27,7 @@ export default class Signup extends Component {
       email,
       password
     };
-    this.signup(user)
+    signup(user)
     .then(data => {
       if(data.error) this.setState({error: data.error});
       else this.setState({
@@ -38,20 +40,7 @@ export default class Signup extends Component {
     });
   };
 
-  signup = user => {
-    return fetch("http://localhost:8080/signup", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(user)
-    })
-      .then(response => {
-        return response.json();
-      })
-      .catch(err => console.log(err));
-  };
+
 
   signupForm = (name, email, password) => (
     <form>
@@ -102,7 +91,7 @@ export default class Signup extends Component {
           {error}
         </div>
         <div className="alert alert-info" style={{ display: open ? "" : "none"}}>
-          New Account is Successfully Created. Please Sign In.
+          New Account is Successfully Created. Please <Link to="/signin">Sign in</Link>
         </div>
         {this.signupForm(name, email, password)}
       </div>
