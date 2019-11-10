@@ -1,4 +1,6 @@
 const _ = require("lodash");
+const formidable = require("formidable");
+const fs = require("fs");
 const User = require("../models/user");
 
 exports.userById = (req, res, next, id) => {
@@ -39,30 +41,72 @@ exports.getUser = (req, res) => {
   return res.json(req.profile);
 };
 
-exports.updateUser =(req, res, next) => {
-  let user = req.profile
-  user = _.extend(user, req.body) // extend - mutate the Source object
-  user.updated = Date.now()
-  user.save((err) => {
-    if(err) {
+// exports.updateUser =(req, res, next) => {
+//   let user = req.profile
+//   user = _.extend(user, req.body) // extend - mutate the Source object
+//   user.updated = Date.now()
+//   user.save((err) => {
+//     if(err) {
+//       return res.status(400).json({
+//         error: "You are not authorized to perform this action"
+//       })
+//     }
+//     user.hashed_password = undefined;
+//     user.salt = undefined;
+//     res.json({user});
+//   });
+// };
+
+exports.updateUser = (req, res, next) => {
+  let form = new formidable.IncomingForm();
+  form.keepExtensions = true;
+  form.parse(req, (err, fields, files) => {
+    if (err) {
       return res.status(400).json({
-        error: "You are not authorized to perform this action"
-      })
+        error: "Photo Could not be uploaded"
+      });
     }
-    user.hashed_password = undefined;
-    user.salt = undefined;   
-    res.json({user});
+    //save user
+    let user = req.profile;
+    user = _.extend(user, fields);
+    user.updated = Date.now();
+
+    if (files.photo) {
+      user.photo.data = fs.readFileSync(files.photo.path);
+      user.photo.contentType = files.photo.type;
+    }
+    user.save((err, result) => {
+      if (err) {
+        return res.status(400).json({
+          error: err
+        });
+      }
+      user.hashed_password = undefined;
+      user.salt = undefined;
+      res.json(user);
+    });
   });
 };
+
+exports.userPhoto = (req, res, next) => {
+  if(req.profile.photo.data) {
+    res.set(("Content-Type", req.profile.photo.contentType));
+    return res.send(req.profile.photo.data); 
+  }
+  next();
+};
+
+
+
 
 exports.deleteUser = (req, res, next) => {
   let user = req.profile;
   user.remove((err, user) => {
-    if(err) {
+    if (err) {
       return res.status(400).json({
         error: err
-      })
-    } 
-    res.json({ message: "user deleted Succesfully" }); 
+      });
+    }
+    res.json({ message: "user deleted Succesfully" });
   });
-}
+};
