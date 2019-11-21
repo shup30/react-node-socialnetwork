@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { isAuthenticated } from "../auth";
 import { Redirect } from "react-router-dom";
-import DefaultAvatar from "../images/Avatar.png";
+import DefaultProfile from "../images/Avatar.png";
 import { read, update, updateUser } from "./apiUser";
 
 export default class EditProfile extends Component {
@@ -45,28 +45,37 @@ export default class EditProfile extends Component {
 
   isValid = () => {
     const { name, email, password, fileSize } = this.state;
-    if (fileSize > 100000) {
-      this.setState({ error: "Filesize should be less than 100kb" });
+    if (fileSize > 1000000) {
+      this.setState({ 
+        error: "File size should be less than 100kb",
+        loading: false
+      });
       return false;
     }
     if (name.length === 0) {
-      this.setState({ error: "Name is Required" });
+      this.setState({ error: "Name is required", loading: false });
       return false;
     }
-    // email@doamin.com
+    // email@domain.com
     if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
-      this.setState({ error: "A Valid Email is required" });
+      this.setState({ 
+        error: "A valid Email is required", 
+        loading: false 
+      });
       return false;
     }
     if (password.length >= 1 && password.length <= 5) {
-      this.setState({ error: "Password must be atleast 6 charcters long" });
+      this.setState({
+          error: "Password must be at least 6 characters long",
+          loading: false 
+        });
       return false;
     }
     return true;
   };
 
   handleChange = name => event => {
-    this.setState({error: ""});
+    this.setState({ error: "" });
     const value = name === "photo" ? event.target.files[0] : event.target.value;
     const fileSize = name === "photo" ? event.target.files[0].size : 0;
     this.userData.set(name, value);
@@ -78,25 +87,21 @@ export default class EditProfile extends Component {
     this.setState({ loading: true });
 
     if (this.isValid()) {
-      const { name, email, password } = this.state;
-      const user = {
-        name,
-        email,
-        password: password || undefined
-      };
-      //console.log(user);
+     
       const userId = this.props.match.params.userId;
       const token = isAuthenticated().token;
 
       update(userId, token, this.userData).then(data => {
-        if (data.error) this.setState({ error: data.error });
-        else
+        if (data.error) {
+          this.setState({ error: data.error }); 
+        }
+        else {
           updateUser(data, () => {
             this.setState({
               redirectToProfile: true
-          } );
-          
+            });
           });
+        }
       });
     }
   };
@@ -104,7 +109,7 @@ export default class EditProfile extends Component {
   signupForm = (name, email, password, about) => (
     <form>
       <div className="form-group">
-        <label className="text-muted">Profile Photo </label>
+        <label className="text-muted">Profile Photo</label>
         <input
           onChange={this.handleChange("photo")}
           type="file"
@@ -155,13 +160,26 @@ export default class EditProfile extends Component {
   );
 
   render() {
-    const { id, name, email, password, redirectToProfile, error, loading, about } = this.state;
+    const {
+      id,
+      name,
+      email,
+      password,
+      redirectToProfile,
+      error,
+      loading,
+      about
+    } = this.state;
 
     if (redirectToProfile) {
-      return <Redirect to={`/user/user${id}`} />;
+      return <Redirect to={`/user/${id}`} />;
     }
 
-    const photoUrl = id ? `${process.env.REACT_APP_API_URL}/user/photo/$(id)` : DefaultAvatar
+    const photoUrl = id
+      ? `${
+        process.env.REACT_APP_API_URL
+      }/user/photo/${id}?${new Date().getTime()}`
+      : DefaultProfile;
 
     return (
       <div className="container">
@@ -173,12 +191,21 @@ export default class EditProfile extends Component {
         >
           {error}
         </div>
-        { loading ? <div className="jumbotron text-center">
+        {loading ? (
+          <div className="jumbotron text-center">
             <h2>Loading...</h2>
-            </div> : ("")
-            }
+          </div>
+        ) : (
+          ""
+        )}
 
-            <img style={{height: '200px', width: 'auto'}} className="img-thumbnail" src={photoUrl} alt={name} />
+        <img
+          style={{ height: "200px", width: "auto" }}
+          className="img-thumbnail"
+          src={photoUrl}
+          onError={i => (i.target.src = `${DefaultProfile}`)}
+          alt={name}
+        />
       </div>
     );
   }

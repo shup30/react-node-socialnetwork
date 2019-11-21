@@ -3,7 +3,7 @@ import { list } from "./apiUser";
 import DefaultAvatar from "../images/Avatar.png";
 import { Link } from "react-router-dom";
 
-export default class Users extends Component {
+export default class Findpeople extends Component {
   constructor() {
     super();
     this.state = {
@@ -11,7 +11,7 @@ export default class Users extends Component {
     };
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     list().then(data => {
       if (data.error) {
         console.log(data.error);
@@ -19,7 +19,7 @@ export default class Users extends Component {
         this.setState({ users: data });
       }
     });
-  }
+  };
 
   renderUsers = users => (
     <div className="row">

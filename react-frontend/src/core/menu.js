@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { signout, isAuthenticated } from "../auth";
 
@@ -23,12 +23,19 @@ const Menu = ({ history }) => (
         </Link>
       </li>
       <li className="nav-item">
-        <Link className="nav-link" style={isActive(history, "/users")} to="/users">
+        <Link
+          className={
+            history.location.pathname === "/users"
+              ? "active nav-link"
+              : "not-active nav-link"
+          }
+          to="/users"
+        >
           Users
         </Link>
       </li>
       {!isAuthenticated() && (
-        <>
+        <React.Fragment>
           <li className="nav-item">
             <Link
               className="nav-link"
@@ -47,11 +54,10 @@ const Menu = ({ history }) => (
               Signup
             </Link>
           </li>
-        </>
-      )}
-      ;
+        </React.Fragment>
+      )};
       {isAuthenticated() && (
-        <>
+        <React.Fragment>
           <li className="nav-item">
             <span
               className="nav-link"
@@ -64,18 +70,17 @@ const Menu = ({ history }) => (
               Sign Out
             </span>
           </li>
-          
-          <li className="nav-item">
-                        <Link
-                            to={`/user/${isAuthenticated().user._id}`}
-                            style={isActive(history, `/user/${isAuthenticated().user._id}`)}
-                            className="nav-link"
-                        >
-                            {`${isAuthenticated().user.name}'s profile`}
-                        </Link>
-                    </li>
-              </>
 
+          <li className="nav-item">
+            <Link
+              to={`/user/${isAuthenticated().user._id}`}
+              style={isActive(history, `/user/${isAuthenticated().user._id}`)}
+              className="nav-link"
+            >
+              {`${isAuthenticated().user.name}'s profile`}
+            </Link>
+          </li>
+        </React.Fragment>
       )}
     </ul>
   </div>
